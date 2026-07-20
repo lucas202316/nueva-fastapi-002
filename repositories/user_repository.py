@@ -40,4 +40,17 @@ def get_all_users(db: sqlite3.Connection):
         FROM usuarios
     """)
 
-    return cursor.fetchall()#lista de tuplas PERO DEBEMOS DEVOLVER DICCIONARIOS
+
+    usuarios = cursor.fetchall()
+
+    resultado = []
+
+    for usuario in usuarios:
+        resultado.append({
+            "id": usuario[0],
+            "nombre": usuario[1],
+            "email": usuario[2]
+        })
+
+    return resultado #ANTES DEVOLVIA LISTA DE TUPLAS AHORA MEJOR DEVUELVE DICCIONARIOS
+
