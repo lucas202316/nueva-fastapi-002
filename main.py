@@ -1,10 +1,18 @@
-import sqlite3
+from database import conexion,cursor
 from fastapi import FastAPI, Depends, HTTPException, status
-from pydantic import BaseModel
+from schemas import Usuario,Login
 import bcrypt
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
-
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    SECRET_KEY,
+    ALGORITHM
+)
+import sqlite3
+#extrae automáticamente el token Bearer del encabezado Authorization
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login"
 )
@@ -12,23 +20,11 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 app = FastAPI()
 
-#CONSTANTES
-SECRET_KEY = "mi_clave_secreta"
-ALGORITHM = "HS256"
 
 
 
-#MODELOS
-#REGISTRO
-class Usuario(BaseModel):
-   nombre: str
-   email: str
-   password: str
 
-#LOGIN   
-class Login(BaseModel):
-   email: str
-   password: str
+
 
 
 #FUNCIONES AUXILIARES
@@ -83,16 +79,13 @@ def login(datos: Login):
                 "error": "Correo o contraseña incorrectos."
             }
     password_guardada = usuario[3]
-    if bcrypt.checkpw(
-        datos.password.encode(),
-        password_guardada.encode()
-    ):
+    if verify_password(
+        datos.password,
+        password_guardada
+):
+
            
-        token = jwt.encode(
-        {"id": usuario[0]},
-        SECRET_KEY,
-        algorithm=ALGORITHM
-    )
+       token = create_access_token(usuario[0])
        
         return {
             "access_token": token
@@ -103,28 +96,21 @@ def login(datos: Login):
         "error": "Correo o contraseña incorrectos."
     }
 
-#PERFIL
+#PERFIL/ruta protegida
 @app.get("/profile")
 def profile(usuario = Depends(get_current_user)):
 
-    return usuario
+    return usuario 
 
 
-#conexión a la base de datos
-ruta = r"C:\Lucas\bbdd\mi_api.db"
-conexion = sqlite3.connect(
-    ruta,
-    check_same_thread=False
-)
-cursor = conexion.cursor()
+
 
 #REGISTRO
 @app.post("/register")
 def register(usuario: Usuario):
-    hash_password = bcrypt.hashpw(
-        usuario.password.encode(),
-        bcrypt.gensalt()
-    )
+    
+    password_hash = hash_password(usuario.password)
+    
     try:
         cursor.execute(
             """
@@ -134,7 +120,7 @@ def register(usuario: Usuario):
             (
                 usuario.nombre,
                 usuario.email,
-                hash_password.decode() #porque estaba en bytes y hay que pasarlo a texto
+                password_hash #porque estaba en bytes y hay que pasarlo a texto
             )
         )
         conexion.commit()
@@ -145,7 +131,7 @@ def register(usuario: Usuario):
     return {
             "mensaje": "Usuario registrado",
             "password_original": usuario.password,
-            "password_hasheada": hash_password.decode()
+            "password_hasheada": password_hash
 
         }
 
