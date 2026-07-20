@@ -1,7 +1,7 @@
-from fastapi import APIRouter
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from schemas import Login
-from database import cursor
+from database import get_db
+import sqlite3
 from auth import (
 verify_password,
 create_access_token
@@ -10,9 +10,19 @@ create_access_token
 
 router = APIRouter()
 
+'''
+Todos los endpoints recibirán la conexión mediante:
+db: sqlite3.Connection = Depends(get_db)
+Y dentro del endpoint crearán su propio cursor:
+cursor = db.cursor()
+
+'''
+
+
 #LOGIN
 @router.post("/login")
-def login(datos: Login):
+def login(datos: Login, db: sqlite3.Connection = Depends(get_db)):
+    cursor = db.cursor()
     cursor.execute(
             "SELECT * FROM usuarios WHERE email = ?",
             (datos.email,)
@@ -24,14 +34,14 @@ def login(datos: Login):
             return {
                 "error": "Correo o contraseña incorrectos."
             }
-    password_guardada = usuario[3]
+    password_guardada = usuario["password"]
     if verify_password(
         datos.password,
         password_guardada
 ):
 
            
-        token = create_access_token(usuario[0])
+        token = create_access_token(usuario["id"])
        
         return {
             "access_token": token

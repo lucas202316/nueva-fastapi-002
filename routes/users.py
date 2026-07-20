@@ -1,11 +1,21 @@
 from fastapi import APIRouter, Depends
 import sqlite3
 from schemas import Usuario
-from database import conexion, cursor
+from database import get_db
 from dependencies import get_current_user
-from auth import hash_password
-
+from exceptions import UserAlreadyExistsError
+from services.auth_service import register_user
 router = APIRouter()
+
+'''
+Todos los endpoints recibirán la conexión mediante:
+db: sqlite3.Connection = Depends(get_db)
+Y dentro del endpoint crearán su propio cursor:
+cursor = db.cursor()
+
+'''
+
+
 
 #PERFIL/ruta protegida
 @router.get("/profile")
@@ -15,38 +25,23 @@ def profile(usuario = Depends(get_current_user)):
 
 #REGISTRO
 @router.post("/register")
-def register(usuario: Usuario):
+def register(usuario: Usuario, db: sqlite3.Connection = Depends(get_db)):
     
-    password_hash = hash_password(usuario.password)
-    
-    try:
-        cursor.execute(
-            """
-            INSERT INTO usuarios(nombre, email, password)
-            VALUES (?, ?, ?)
-            """,
-            (
-                usuario.nombre,
-                usuario.email,
-                password_hash #porque estaba en bytes y hay que pasarlo a texto
-            )
+        try:
+
+            register_user(
+            usuario,
+            db
         )
-        conexion.commit()
 
-    except sqlite3.IntegrityError:
-        return {"mensaje": "El correo electrónico ya está registrado"}
-    
-    return {
-            "mensaje": "Usuario registrado",
-            "password_original": usuario.password,
-            "password_hasheada": password_hash
+            return {
+                "mensaje": "Usuario registrado"
+            }
 
+        except UserAlreadyExistsError:
+
+            return {
+            "mensaje": "El correo electrónico ya está registrado"
         }
 
 
-#SOLICITUDES
-'''{
-    "nombre":"Juan",
-    "email":"juan@gmail.com",
-    "password":"123456"
-}'''

@@ -1,0 +1,26 @@
+# entorno virtual
+.venv/
+
+# cache
+__pycache__/
+*.pyc
+
+# VSCode
+.vscode/
+
+# variables
+.env
+
+# SQLite
+*.db
+*.sqlite3
+
+# logs
+*.log
+
+# Configuración de PyCharm
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

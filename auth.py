@@ -2,10 +2,8 @@
 #las funciones para crear y decodificar el JWT
 import bcrypt
 from jose import jwt
-
+from config import SECRET_KEY, ALGORITHM
 #CONSTANTES
-SECRET_KEY = "mi_clave_secreta"
-ALGORITHM = "HS256"
 
 #funcion crear hash
 def hash_password(password: str) -> str:
