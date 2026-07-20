@@ -5,6 +5,7 @@ from schemas import Usuario
 from exceptions import UserAlreadyExistsError
 
 #función que representa una operación sobre la tabla usuarios
+#no crea conexiones las recibe en db:sqlite3.Connection
 def create_user(usuario: Usuario,
                 password_hash: str,
                 db: sqlite3.Connection
@@ -29,3 +30,14 @@ def create_user(usuario: Usuario,
     except sqlite3.IntegrityError:
 
         raise UserAlreadyExistsError()
+
+#Cada operación sobre la base de datos debe utiliza su propio cursor
+def get_all_users(db: sqlite3.Connection):
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT id, nombre, email
+        FROM usuarios
+    """)
+
+    return cursor.fetchall()#lista de tuplas PERO DEBEMOS DEVOLVER DICCIONARIOS

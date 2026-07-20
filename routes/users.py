@@ -4,6 +4,7 @@ from schemas import Usuario
 from database import get_db
 from dependencies import get_current_user
 from exceptions import UserAlreadyExistsError
+from services import user_service
 from services.auth_service import register_user
 router = APIRouter()
 
@@ -44,4 +45,10 @@ def register(usuario: Usuario, db: sqlite3.Connection = Depends(get_db)):
             "mensaje": "El correo electrónico ya está registrado"
         }
 
+#USUARIOS
+@router.get("/users")
+def get_users(
+    db: sqlite3.Connection = Depends(get_db)
+):
+    return user_service.get_all_users(db)
 
