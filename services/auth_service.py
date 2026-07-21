@@ -3,6 +3,7 @@ import sqlite3
 from schemas import Usuario
 from auth import hash_password
 from repositories.user_repository import create_user
+from exceptions import InvalidCredentialsError
 
 
 def register_user(

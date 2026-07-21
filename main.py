@@ -4,12 +4,24 @@ from fastapi import FastAPI
 
 from routes.auth import router as auth_router
 from routes.users import router as users_router
+from handlers import user_not_found_handler,user_already_exists_handler
+
+from exceptions import UserNotFoundError,UserAlreadyExistsError
 
 
 
 app = FastAPI()
 app.include_router(auth_router)
 app.include_router(users_router)
+app.add_exception_handler(
+    UserNotFoundError,
+    user_not_found_handler
+)
+app.add_exception_handler(
+    UserAlreadyExistsError,
+    user_already_exists_handler
+)
+
 
 #ENDPOINTS
 #INICIO
