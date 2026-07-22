@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends
-from schemas import Login
+from schemas import Login, Token
 from database import  get_db
 from auth import (
 verify_password,
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 #LOGIN
-@router.post("/login")#va a routes/auth
+@router.post("/login",response_model=Token)#va a routes/auth
 def login(datos: Login,db: sqlite3.Connection = Depends(get_db)):#ademas de datos debe recibir db de dependens(get_db)
     cursor = db.cursor()
 
@@ -37,7 +37,9 @@ def login(datos: Login,db: sqlite3.Connection = Depends(get_db)):#ademas de dato
         token = create_access_token(usuario["id"])
        
         return {
-            "access_token": token
+            "access_token": token,
+            "token_type": "bearer"
+
         }
 
            

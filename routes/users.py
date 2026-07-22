@@ -3,7 +3,7 @@ import sqlite3
 
 from services import user_service
 
-from schemas import Usuario, UserUpdate
+from schemas import Usuario, UserUpdate, UsuarioResponse, MessageResponse
 from services.auth_service import register_user
 from dependencies import get_current_user
 from auth import hash_password
@@ -19,14 +19,14 @@ def profile(usuario = Depends(get_current_user)):
     return usuario 
 
 #BUSCA TODOS LOS USUARIOS
-@router.get("/users")
+@router.get("/users",response_model=list[UsuarioResponse])
 def get_users(
     db: sqlite3.Connection = Depends(get_db)
 ):
     return user_service.get_all_users(db)
 
 #BUSCAR POR ID
-@router.get("/users/{user_id}")
+@router.get("/users/{user_id}",response_model=UsuarioResponse)
 def get_user_by_id(
     user_id: int,
     db: sqlite3.Connection = Depends(get_db)
@@ -89,7 +89,7 @@ def delete_user(
 
 
 #REGISTRO
-@router.post("/register",)#va a routes/users y despues la logica de negocio a servicios
+@router.post("/register",response_model=MessageResponse)#va a routes/users y despues la logica de negocio a servicios
 def register(usuario: Usuario,db: sqlite3.Connection = Depends(get_db)):
     password_hash = hash_password(usuario.password)
 
