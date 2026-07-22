@@ -7,42 +7,24 @@ create_access_token
 )
 import sqlite3
 router = APIRouter()
+from services import auth_service
 
 
 
 #LOGIN
 @router.post("/login",response_model=Token)#va a routes/auth
 def login(datos: Login,db: sqlite3.Connection = Depends(get_db)):#ademas de datos debe recibir db de dependens(get_db)
-    cursor = db.cursor()
+    usuario = auth_service.login(
+    db,
+    datos.email,
+    datos.password
+)
+    return auth_service.login(
+    db,
+    datos.email,
+    datos.password
+)
 
-    cursor.execute(
-
-            "SELECT * FROM usuarios WHERE email = ?",
-            (datos.email,)
-        )
-
-
-    usuario = cursor.fetchone()
-    if usuario is None:
-            return {
-                "error": "Correo o contraseña incorrectos."
-            }
-    password_guardada = usuario["password"]
-    if verify_password(
-        datos.password,
-        password_guardada
-
-    ):
-           
-        token = create_access_token(usuario["id"])
-       
-        return {
-            "access_token": token,
-            "token_type": "bearer"
-
-        }
-
-           
-    return {
-        "error": "Correo o contraseña incorrectos."
-    }
+    
+    
+    

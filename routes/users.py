@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends,  status
 import sqlite3
 
 from services import user_service
@@ -8,7 +8,7 @@ from services.auth_service import register_user
 from dependencies import get_current_user
 from auth import hash_password
 from database import get_db
-from exceptions import UserAlreadyExistsError, UserNotFoundError
+from exceptions import UserAlreadyExistsError
 
 router = APIRouter()
 
@@ -31,14 +31,12 @@ def get_user_by_id(
     user_id: int,
     db: sqlite3.Connection = Depends(get_db)
 ):
-    try:
-        return user_service.get_user_by_id(db, user_id)
+    
+        return user_service.get_user_by_id(
+            db=db,
+            user_id=user_id
+)
 
-    except UserNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuario no encontrado"
-        )
 #MODIFICA USUARIO POR ID
 @router.put("/users/{user_id}",response_model=UsuarioResponse)
 def update_user(
@@ -46,7 +44,7 @@ def update_user(
     datos: UserUpdate,
     db: sqlite3.Connection = Depends(get_db)
 ):
-    try:
+   
         return user_service.update_user(
             db=db,
             user_id=user_id,
@@ -54,54 +52,34 @@ def update_user(
             email=datos.email
         )
 
-        
-    except UserNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuario no encontrado"
-        )
-
+   
 #BORRA USUARIO
 @router.delete("/users/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: int,
     db: sqlite3.Connection = Depends(get_db)
 ):
-    try:
+    
         user_service.delete_user(
             db=db,
             user_id=user_id
         )
 
-    except UserNotFoundError:
-        raise HTTPException(
-            status_code=404,
-            detail="Usuario no encontrado"
-        )
-
+    
 
 
 #REGISTRO
-@router.post("/register",response_model=MessageResponse,status_code=status.HTTP_201_CREATED)#va a routes/users y despues la logica de negocio a servicios
-def register(usuario: Usuario,db: sqlite3.Connection = Depends(get_db)):
-    password_hash = hash_password(usuario.password)
-
-    try:
-
-        register_user(
+@router.post("/register",
+             response_model=MessageResponse,
+             status_code=status.HTTP_201_CREATED)#va a routes/users y despues la logica de negocio a servicios
+def register(usuario: Usuario,
+             db: sqlite3.Connection = Depends(get_db)):
+    
+    return  register_user(
             usuario,
             db
         )
 
-        return {
-            "mensaje": "Usuario registrado"
-        }
-
-    except UserAlreadyExistsError:
-
-        return {
-            "mensaje": "El correo electrónico ya está registrado"
-        }
 
 #SOLICITUDES
 '''{
