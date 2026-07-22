@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 import sqlite3
 
 from services import user_service
@@ -40,24 +40,21 @@ def get_user_by_id(
             detail="Usuario no encontrado"
         )
 #MODIFICA USUARIO POR ID
-@router.put("/users/{user_id}")
+@router.put("/users/{user_id}",response_model=UsuarioResponse)
 def update_user(
     user_id: int,
     datos: UserUpdate,
     db: sqlite3.Connection = Depends(get_db)
 ):
     try:
-        user_service.update_user(
+        return user_service.update_user(
             db=db,
             user_id=user_id,
             nombre=datos.nombre,
             email=datos.email
         )
 
-        return {
-            "message": "Usuario actualizado correctamente"
-        }
-
+        
     except UserNotFoundError:
         raise HTTPException(
             status_code=404,
@@ -65,7 +62,7 @@ def update_user(
         )
 
 #BORRA USUARIO
-@router.delete("/users/{user_id}")
+@router.delete("/users/{user_id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: int,
     db: sqlite3.Connection = Depends(get_db)
@@ -76,10 +73,6 @@ def delete_user(
             user_id=user_id
         )
 
-        return {
-            "message": "Usuario eliminado correctamente"
-        }
-
     except UserNotFoundError:
         raise HTTPException(
             status_code=404,
@@ -89,7 +82,7 @@ def delete_user(
 
 
 #REGISTRO
-@router.post("/register",response_model=MessageResponse)#va a routes/users y despues la logica de negocio a servicios
+@router.post("/register",response_model=MessageResponse,status_code=status.HTTP_201_CREATED)#va a routes/users y despues la logica de negocio a servicios
 def register(usuario: Usuario,db: sqlite3.Connection = Depends(get_db)):
     password_hash = hash_password(usuario.password)
 

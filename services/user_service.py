@@ -20,15 +20,16 @@ def update_user(
     nombre: str,
     email: str
 ):
-    filas_actualizadas = user_repository.update_user(
+    usuario_actualizado = user_repository.update_user(
         db,
         user_id,
         nombre,
         email
     )
 
-    if filas_actualizadas == 0:
+    if usuario_actualizado is None:
         raise UserNotFoundError()
+    return usuario_actualizado
 
 def delete_user(
     db: sqlite3.Connection,

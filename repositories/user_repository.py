@@ -85,8 +85,19 @@ def update_user(
     """, (nombre, email, user_id))
 
     db.commit()
+    return get_user_by_id(
+        db,
+        user_id
+    )
 
-    return cursor.rowcount
+
+    
+    '''usuario = cursor.fetchone()
+
+    if usuario is None:
+        return None
+
+    return dict(usuario)'''
 
 def delete_user(db: sqlite3.Connection, user_id: int):
     cursor = db.cursor()
