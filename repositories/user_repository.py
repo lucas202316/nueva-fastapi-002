@@ -6,20 +6,23 @@ from exceptions import UserAlreadyExistsError
 def create_user(
     usuario: Usuario,
     password_hash: str,
+    rol: str,
     db: sqlite3.Connection
+    
 ):
     try:
         cursor = db.cursor()
 
         cursor.execute(
             """
-            INSERT INTO usuarios(nombre, email, password)
-            VALUES (?, ?, ?)
+            INSERT INTO usuarios(nombre, email, password, role)
+            VALUES (?, ?, ?, ?)
             """,
             (
                 usuario.nombre,
                 usuario.email,
-                password_hash
+                password_hash,
+                rol
             )
         )
 
@@ -33,7 +36,7 @@ def get_all_users(db: sqlite3.Connection):
     cursor = db.cursor()
 
     cursor.execute("""
-        SELECT id, nombre, email
+        SELECT id, nombre, email,role
         FROM usuarios
     """)
 
@@ -45,7 +48,9 @@ def get_all_users(db: sqlite3.Connection):
         resultado.append({
             "id": usuario[0],
             "nombre": usuario[1],
-            "email": usuario[2]
+            "email": usuario[2],
+            "role": usuario[3]
+            
         })
 
     return resultado
@@ -54,7 +59,7 @@ def get_user_by_id(db: sqlite3.Connection, user_id: int):
     cursor = db.cursor()
 
     cursor.execute("""
-        SELECT id, nombre, email
+        SELECT id, nombre, email, role
         FROM usuarios
         WHERE id = ?
     """, (user_id,))
@@ -67,7 +72,8 @@ def get_user_by_id(db: sqlite3.Connection, user_id: int):
     return {
         "id": usuario[0],
         "nombre": usuario[1],
-        "email": usuario[2]
+        "email": usuario[2],
+        "role": usuario[3]
     }
 
 def update_user(

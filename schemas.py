@@ -4,8 +4,6 @@ class UsuarioBase(BaseModel):
     nombre: str
     email: str
 
-
-
 class Usuario(UsuarioBase):
     password: str
     
@@ -18,6 +16,8 @@ class UserUpdate(UsuarioBase):
 
 class UsuarioResponse(UsuarioBase):
     id: int
+    rol: str
+    
 
 class Token(BaseModel):
     access_token: str

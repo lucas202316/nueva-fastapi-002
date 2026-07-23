@@ -13,12 +13,14 @@ def register_user(
     db: sqlite3.Connection
 ):
     password_hash = hash_password(usuario.password)
-
+    rol="user"
     
     create_user(
         usuario,
         password_hash,
+        rol,
         db
+        
     )
     return {
         "mensaje": "Usuario registrado"
@@ -46,7 +48,12 @@ def login(
     ):
         raise InvalidCredentialsError()
             
-    token = create_access_token(usuario["id"])
+    token = create_access_token(
+        usuario["id"],
+        usuario["role"]
+        )
+
+
         
     return {
             "access_token": token,
