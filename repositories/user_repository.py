@@ -49,7 +49,7 @@ def get_all_users(db: sqlite3.Connection):
             "id": usuario[0],
             "nombre": usuario[1],
             "email": usuario[2],
-            "role": usuario[3]
+            "rol": usuario[3]
             
         })
 
@@ -73,7 +73,7 @@ def get_user_by_id(db: sqlite3.Connection, user_id: int):
         "id": usuario[0],
         "nombre": usuario[1],
         "email": usuario[2],
-        "role": usuario[3]
+        "rol": usuario[3]
     }
 
 def update_user(

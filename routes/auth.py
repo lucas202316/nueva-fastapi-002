@@ -8,20 +8,18 @@ create_access_token
 import sqlite3
 router = APIRouter()
 from services import auth_service
+from fastapi.security import OAuth2PasswordRequestForm
 
 
 
 #LOGIN
 @router.post("/login",response_model=Token)#va a routes/auth
-def login(datos: Login,db: sqlite3.Connection = Depends(get_db)):#ademas de datos debe recibir db de dependens(get_db)
-    usuario = auth_service.login(
-    db,
-    datos.email,
-    datos.password
-)
+def login(datos: OAuth2PasswordRequestForm = Depends(),db: sqlite3.Connection = Depends(get_db)):#ademas de datos debe recibir db de dependens(get_db)
+    
+
     return auth_service.login(
     db,
-    datos.email,
+    datos.username,
     datos.password
 )
 

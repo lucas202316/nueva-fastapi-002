@@ -43,3 +43,5 @@ def delete_user(
     if filas_eliminadas == 0:
         raise UserNotFoundError()
   
+def is_admin(usuario: dict) -> bool:
+    return usuario.get("rol") == "admin"

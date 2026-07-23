@@ -2,8 +2,16 @@
 from fastapi import FastAPI
 from routes.auth import router as auth_router
 from routes.users import router as users_router
-from handlers import user_not_found_handler, user_already_exists_handler, invalid_credentials_handler
-from exceptions import UserNotFoundError, UserAlreadyExistsError, InvalidCredentialsError
+from handlers import (
+                        user_not_found_handler, 
+                        user_already_exists_handler, 
+                        invalid_credentials_handler,
+                        permission_denied_handler)
+from exceptions import (
+                        UserNotFoundError, 
+                        UserAlreadyExistsError, 
+                        InvalidCredentialsError,
+                        PermissionDeniedError)
 
 
 
@@ -23,6 +31,11 @@ app.add_exception_handler(
 app.add_exception_handler(
     InvalidCredentialsError,
     invalid_credentials_handler
+)
+
+app.add_exception_handler(
+    PermissionDeniedError,
+    permission_denied_handler
 )
 
 

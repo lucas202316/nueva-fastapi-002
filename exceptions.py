@@ -10,3 +10,7 @@ class UserNotFoundError(Exception):
 
 class InvalidCredentialsError(Exception):
     pass
+
+class PermissionDeniedError(Exception):
+    """Se lanza cuando un usuario no tiene permisos para realizar una acción."""
+    pass
